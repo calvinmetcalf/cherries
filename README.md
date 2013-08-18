@@ -3,6 +3,8 @@ cherries
 
 Some core stand-alone functions written in a functional style, for when you don't need an entire library.
 
+Find documentation and examples here: [casperin.github.io/cherries/](http://casperin.github.io/cherries/)
+
 License
 =======
 
