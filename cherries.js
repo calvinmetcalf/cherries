@@ -107,7 +107,9 @@ function pluck(prop,xs){
     var i = -1;
     var len = xs2.length;
     while (++i < len) {
-      result.push(xs[i][prop]);
+      if(xs2[i][prop]){
+        result.push(xs2[i][prop]);
+      }
     }
     return result;
   };
