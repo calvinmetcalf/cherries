@@ -2,7 +2,7 @@
 
 
 // can't curry this :(
-var compose = function() {
+function compose() {
   var fns = arguments;
   return function() {
     var args = arguments, i = fns.length;
@@ -10,10 +10,10 @@ var compose = function() {
       args = [fns[i].apply(this, args)];
     return args[0];
   };
-},
+}
 
 
-curry = function(fn) {
+function curry(fn) {
   var toArray = function(arr, from) {
     return Array.prototype.slice.call(arr, from || 0);
   },
@@ -21,9 +21,9 @@ curry = function(fn) {
   return function() {
     return fn.apply(this, args.concat(toArray(arguments)));
   };
-},
+}
 
-autoCurry = function(fn, numArgs) {
+function autoCurry(fn, numArgs) {
   var toArray = function(arr, from) {
     return Array.prototype.slice.call(arr, from || 0);
   },
@@ -41,56 +41,110 @@ autoCurry = function(fn, numArgs) {
       return fn.apply(this, arguments);
     }
   };
-},
+}
 
 
 
-id = function(x){ return x },
+function id(x){ return x }
 
-isType = autoCurry(function(s, x){
-  var t = typeof x,
-      s = s.toLowerCase();
-  if (s === 'object') return (t === 'object') && (x.length !=  +x.length);
-  if (s === 'array' ) return (t === 'object') && (x.length === +x.length);
-  return (s === t);
-}),
-
-
-replicate = autoCurry(function(n, x){
-  var result = [], i = 0;
-  while (i++ < n)
-    result.push(x);
-  return result;
-}),
-
-
-dot = autoCurry(function(prop, obj){
-  return obj[prop];
-}),
-
-
-pluck = autoCurry(function(prop, xs){
-  var result = [], i = -1, len = xs.length;
-  while (++i < len)
-    result.push(xs[i][prop])
-  return result;
-}),
-
-
-each = autoCurry(function(fn, xs){
-  if (xs.forEach) return xs.forEach(fn);
-  if (xs.length === +xs.length) {
-    var i = -1, len = xs.length;
-    while (++i < len)
-      fn(xs[i]);
-  } else {
-    for (var k in xs)
-      xs.hasOwnProperty(k) && fn(xs[k]);
+function isType(s, x){
+  var s = s.toLowerCase();
+  var returnFunc;
+  if (s === 'object') { 
+    returnFunc = function (x2){
+      var t = typeof x2;
+      return (t === 'object') && (x2.length !=  +x2.length);
+    };
   }
-  return xs;
-}),
+  else if (s === 'array' ) {
+    returnFunc = function (x2){
+      var t = typeof x2;
+      return (t === 'object') && (x2.length === +x2.length);
+    };
+  }
+  else{
+    returnFunc = function(x2){
+      return (s === typeof x2);
+    };
+  }
+  if(arguments.length === 1){
+    return returnFunc;
+  } else if(arguments.length === 2){
+    return returnFunc(x);
+  }
+}
 
+function replicate(n, x){
+  var returnFunc = function(x2){
+    var result = [];
+    var i = 0;
+    while (i++ < n){
+      result.push(x2);
+    }
+    return result;
+  };
+  if(arguments.length === 1){
+    return returnFunc;
+  } else if(arguments.length === 2){
+    return returnFunc(x);
+  }
+}
 
+function dot(prop, obj){
+  var returnFunc = function(o2){
+    return o2[prop];
+  };
+  if(arguments.length === 1){
+    return returnFunc;
+  } else if(arguments.length === 2){
+    return returnFunc(obj);
+  }
+}
+
+function pluck(prop,xs){
+  var returnFunc = function(xs2){
+    var result = [];
+    var i = -1;
+    var len = xs2.length;
+    while (++i < len) {
+      result.push(xs[i][prop]);
+    }
+    return result;
+  };
+  if(arguments.length === 1){
+    return returnFunc;
+  } else if(arguments.length === 2){
+    return returnFunc(xs);
+  }
+}
+
+function each(fn,xs){
+  var returnFunc;
+  if(Array.prototype.forEach){
+    returnFunc = function(xs2){
+      xs2.forEach(fn);
+    };
+  } else {
+    returnFunc = function(xs2){
+      var i,len;
+      if (xs2.length === +xs2.length) {
+        i = -1;
+        len = xs2.length;
+        while (++i < len)
+          fn(xs2[i]);
+      } else {
+        for (i in xs2) {
+          xs2.hasOwnProperty(i) && fn(xs2[i]);
+        }
+      }
+    };
+  }
+  if(arguments.length === 1){
+    return returnFunc;
+  } else if(arguments.length === 2){
+    return returnFunc(xs);
+  }
+}
 
 map = autoCurry(function(fn, xs){
   if (xs.map) return xs.map(fn);
