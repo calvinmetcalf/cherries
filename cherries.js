@@ -47,7 +47,6 @@ autoCurry = function(fn, numArgs) {
 
 id = function(x){ return x },
 
-
 isType = autoCurry(function(s, x){
   var t = typeof x,
       s = s.toLowerCase();
